@@ -3591,7 +3591,18 @@ class YoutubeIE(YoutubeBaseInfoExtractor):
         base_url = self.http_scheme() + '//www.youtube.com/'
         webpage_url = base_url + 'watch?v=' + video_id
 
-        webpage, master_ytcfg, player_responses, player_url = self._download_player_responses(url, smuggled_data, video_id, webpage_url)
+        # harryliuwx888@gmail.com
+        master_ytcfg = None
+        player_responses = None
+        player_url = None
+        extractor_args = self.get_param('extractor_args',default={}).get('youtube')
+        if extractor_args:
+            webpage = extractor_args.get('webpage')
+            master_ytcfg = extractor_args.get('ytcfg')
+            player_responses = extractor_args.get('ytPlayerResponses')
+            player_url = master_ytcfg['PLAYER_JS_URL'] if master_ytcfg else None
+        if not master_ytcfg or not player_responses or not player_url:
+            webpage, master_ytcfg, player_responses, player_url = self._download_player_responses(url, smuggled_data, video_id, webpage_url)
 
         playability_statuses = traverse_obj(
             player_responses, (..., 'playabilityStatus'), expected_type=dict)
